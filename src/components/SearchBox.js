@@ -2,7 +2,7 @@ import { Image, StyleSheet, TextInput, View } from "react-native";
 import React from "react";
 
 import * as Animatable from "react-native-animatable";
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 
 export default function SearchBox({value, setValue}) {
   return (

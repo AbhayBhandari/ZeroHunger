@@ -11,7 +11,7 @@ import {
 import React, { useState } from "react";
 import * as Animatable from "react-native-animatable";
 
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 import Categories from "../utils/Categories";
 import SignUp from "../components/SignUp";
 

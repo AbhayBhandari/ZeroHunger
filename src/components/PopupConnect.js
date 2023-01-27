@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React from "react";
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 import MyButton from "./MyButton";
 
 export default function PopupConnect({ onPressDone, categoryData, imageUri }) {

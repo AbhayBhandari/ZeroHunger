@@ -8,7 +8,7 @@ import {
 import React, { useState } from "react";
 import * as Animatable from "react-native-animatable";
 
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 import InputBox from "../components/InputBox";
 import MyButton from "../components/MyButton";
 

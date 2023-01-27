@@ -4,10 +4,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
-import LoginScreen from "./screen/LoginScreen";
-import OnBoardingScreen from "./screen/OnBoardingScreen";
-import RegistrationScreen from "./screen/RegistrationScreen";
-import HomeScreen from "./screen/HomeScreen";
+import LoginScreen from "./src/screen/LoginScreen";
+import OnBoardingScreen from "./src/screen/OnBoardingScreen";
+import RegistrationScreen from "./src/screen/RegistrationScreen";
+import HomeScreen from "./src/screen/HomeScreen";
 
 export default function App() {
 

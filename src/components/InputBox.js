@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View } from "react-native";
 import React from "react";
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 
 export default function InputBox({
   placeholder,

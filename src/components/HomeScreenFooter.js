@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 
 export default function HomeScreenFooter({ userImage }) {
   return (

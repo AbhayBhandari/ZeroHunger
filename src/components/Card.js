@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import MyButton from "./MyButton";
 import PopupConnect from "./PopupConnect";
-import { myDatabase } from "../FirebaseConfig";
+import { myDatabase } from "../utils/FirebaseConfig";
 
 export default function Card({ imageUri, name, type, location, userId }) {
   const [modalVisible, setModalVisible] = useState(false);

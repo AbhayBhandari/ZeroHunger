@@ -13,7 +13,7 @@ import HomeScreenFooter from "../components/HomeScreenFooter";
 import SearchBox from "../components/SearchBox";
 import Card from "../components/Card";
 
-import { myDatabase, myStorage } from "../FirebaseConfig";
+import { myDatabase, myStorage } from "../utils/FirebaseConfig";
 
 export default function HomeScreen() {
   const [DATA, setDATA] = useState([]);
@@ -21,7 +21,7 @@ export default function HomeScreen() {
   useEffect(() => {
     myDatabase
       .collection("users")
-      .where("type", "==", "Caterering")
+      //.where("type", "==", "Caterering")
       .get()
       .then((categoryData) => {
         categoryData.forEach((data) => {

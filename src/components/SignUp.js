@@ -9,9 +9,9 @@ import {
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 
-import Colors from "../Colors";
-import InputBox from "../components/InputBox";
-import { myAuthentication, myDatabase, myStorage } from "../FirebaseConfig";
+import Colors from "../utils/Colors";
+import InputBox from "./InputBox";
+import { myAuthentication, myDatabase, myStorage } from "../utils/FirebaseConfig";
 import MyButton from "./MyButton";
 import { useNavigation } from "@react-navigation/native";
 

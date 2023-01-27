@@ -2,7 +2,7 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
-import Colors from "../Colors";
+import Colors from "../utils/Colors";
 
 export default function MyButton({ text, onPress, buttonStyle, textStyle }) {
   return (
