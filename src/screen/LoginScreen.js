@@ -1,19 +1,14 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import * as Animatable from "react-native-animatable";
 
 import Colors from "../utils/Colors";
 import InputBox from "../components/InputBox";
 import MyButton from "../components/MyButton";
+import { myAuthentication, myDatabase } from "../utils/FirebaseConfig";
 
 export default function LoginScreen({ navigation }) {
-
+  const [isLoginButtonPressed, setLoginButtonPressed] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,6 +26,48 @@ export default function LoginScreen({ navigation }) {
       setEyeIcon(openEyeIcon);
     } else {
       setEyeIcon(closedEyeIcon);
+    }
+  };
+
+  const handleLogin = async () => {
+    let tempEmail = email;
+    tempEmail = tempEmail.trim();
+
+    if (tempEmail == "" || password == "") {
+      alert("Please fill all the details");
+    } else {
+      setLoginButtonPressed(true);
+      await myAuthentication
+        .signInWithEmailAndPassword(tempEmail, password)
+        .then(() => {
+          setLoginButtonPressed(false);
+          myDatabase
+            .collection("users")
+            .doc(myAuthentication.currentUser.uid)
+            .get()
+            .then((categoryData) => {
+              //set false to true
+              if (categoryData.data().is_Verified == true) {
+                navigation.navigate("Home");
+              } else {
+                alert(
+                  "Account is not verified yet. Please wait for few hours."
+                );
+              }
+            });
+        })
+        .catch((error) => {
+          setLoginButtonPressed(false);
+          if (error.code == "auth/user-not-found") {
+            alert("You have not registered with this email-id.");
+          }
+          if (error.code == "auth/wrong-password") {
+            alert("Incorrect Password");
+          }
+          if (error.code == "auth/invalid-email") {
+            alert("Invalid Email");
+          }
+        });
     }
   };
 
@@ -98,7 +135,11 @@ export default function LoginScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
 
-        <MyButton text="Login" onPress={()=>navigation.navigate('Home')}/>
+        <MyButton
+          isButtonPressed={isLoginButtonPressed}
+          text="Login"
+          onPress={() => handleLogin()}
+        />
 
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Text style={{ color: "#8f8f8f" }}>New to Zero Hunger?{"  "}</Text>
@@ -114,7 +155,6 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: Colors.primary,
@@ -142,14 +182,13 @@ const styles = StyleSheet.create({
     margin: 20,
     borderBottomColor: Colors.primary,
     borderBottomWidth: 1,
-    
   },
   footer: {
     flex: 2,
     backgroundColor: Colors.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingTop: 40
+    paddingTop: 40,
   },
 
   welcomeHeading: {
