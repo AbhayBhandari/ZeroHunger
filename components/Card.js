@@ -1,11 +1,34 @@
 import { StyleSheet, Text, View, Image, Modal, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import MyButton from "./MyButton";
 import PopupConnect from "./PopupConnect";
+import { myDatabase } from "../FirebaseConfig";
 
-export default function Card({ imageUri, name, type, location }) {
+export default function Card({ imageUri, name, type, location, userId }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const [categoryData, setCategoryData] = useState({});
+
+  useEffect(() => {
+    myDatabase
+      .collection("users")
+      .doc(userId)
+      .get()
+      .then((data) => {
+        setCategoryData({
+          categoryName: data.data().category_name,
+          categoryType: data.data().type,
+          categoryAddress: `${data.data().category_city}, ${
+            data.data().category_state
+          }`,
+          registrantName: data.data().registrant_name,
+          email: data.data().email,
+          mobile: data.data().mobile,
+          fullAddress: data.data().category_address,
+        });
+      });
+  }, []);
+
   return (
     <View style={styles.container}>
       <Modal
@@ -16,18 +39,22 @@ export default function Card({ imageUri, name, type, location }) {
           setModalVisible(false);
         }}
       >
-        <PopupConnect onPressDone={() => setModalVisible(false)} />
+        <PopupConnect
+          categoryData={categoryData}
+          onPressDone={() => setModalVisible(false)}
+          imageUri={imageUri}
+        />
       </Modal>
       <View style={styles.cardComponent}>
-        <Image style={styles.cardImage} source={imageUri} />
-        <View style={styles.cardDetails}>
+        <Image style={styles.cardImage} source={{ uri: imageUri }} />
+        <View style={styles.contentWrapper}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.type}>{type}</Text>
           <Text style={styles.location}>{location}</Text>
         </View>
         <MyButton
           onPress={() => setModalVisible(true)}
-          buttonStyle={{ width: "60%", height: 40 }}
+          buttonStyle={{ width: "60%", height: 40, left: 20 }}
           textStyle={{ fontSize: 14, fontWeight: "600" }}
           text="Connect"
         />
@@ -43,13 +70,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 10,
   },
-  cardDetails: {
-    marginLeft: -35,
-  },
   cardImage: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
+    width: 60,
+    height: 60,
+    resizeMode: "center",
     borderRadius: 100,
     overflow: "hidden",
   },
@@ -59,8 +83,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.8,
     marginHorizontal: 13,
     padding: 5,
-    marginBottom: 8,
-    top:20
+    marginBottom: 10,
+    top: 20,
+  },
+  contentWrapper: {
+    position: "absolute",
+    left: 85,
   },
   name: {
     fontFamily: "serif",

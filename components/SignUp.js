@@ -7,17 +7,22 @@ import {
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 
-import { myAuthentication, myDatabase, myStorage } from "../FirebaseConfig";
 import Colors from "../Colors";
 import InputBox from "../components/InputBox";
+import { myAuthentication, myDatabase, myStorage } from "../FirebaseConfig";
+import MyButton from "./MyButton";
+import { useNavigation } from "@react-navigation/native";
 
-export default function RestaurantSignUp() {
-  const [restaurantName, setRestaurantName] = useState("");
-  const [restaurantAddress, setRestaurantAddress] = useState("");
-  const [restaurantImageUri, setRestaurantImageUri] = useState(null);
+export default function SignUp({ categoryType }) {
+  const navigation = useNavigation();
+
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryCity, setCategoryCity] = useState("");
+  const [categoryState, setCategoryState] = useState("");
+  const [categoryAddress, setCategoryAddress] = useState("");
+  const [categoryImageUri, setCategoryImageUri] = useState(null);
   const [fssaiImageUri, setFssaiImageUri] = useState(null);
 
   const [registrantName, setRegistrantName] = useState("");
@@ -44,18 +49,18 @@ export default function RestaurantSignUp() {
   };
 
   //Uploading Image
-  const handleUploadRestaurantImage = async () => {
+  const handleUploadCategoryImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
 
     if (!result.cancelled) {
-      setRestaurantImageUri(result.uri);
+      setCategoryImageUri(result.uri);
     }
   };
 
-  const handleUploadRestaurantFssaiImage = async () => {
+  const handleUploadCategoryFssaiImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
@@ -140,75 +145,79 @@ export default function RestaurantSignUp() {
     }
   };
 
-const uploadImage = async (imageUri, imageType, userId) => {
-  const response = await fetch(imageUri);
-  const blob = await response.blob();
+  const uploadImage = async (imageUri, imageType, userId) => {
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
 
-  let filenameAfterDot = imageUri.substring(imageUri.lastIndexOf(".") + 1);
+    let filenameAfterDot = imageUri.substring(imageUri.lastIndexOf(".") + 1);
 
-  let filepath = "users/restaurants/" + userId + "/";
+    let filepath = `users/${categoryType}/` + userId + "/";
 
-  let filename = imageType + "." + filenameAfterDot;
+    let filename = imageType + "." + filenameAfterDot;
 
-  filepath += filename;
+    filepath += filename;
 
-  var ref = myStorage.ref().child(filepath).put(blob);
+    var ref = myStorage.ref().child(filepath).put(blob);
 
-  try {
-    await ref;
-  } catch (e) {
-    console.log("error is ", e);
-  }
-};
-
-const signUp = async (registrantEmail, registrantPassword) => {
-  try {
-    await myAuthentication
-      .createUserWithEmailAndPassword(registrantEmail, registrantPassword)
-      .then(() => {
-        uploadImage(fssaiImageUri, "fssai", myAuthentication.currentUser.uid);
-        uploadImage(restaurantImageUri, "restaurant", myAuthentication.currentUser.uid);
-        uploadImage(
-          registrantIdImageUri,
-          "id",
-          myAuthentication.currentUser.uid
-        );
-      })
-      .then(() => {
-        myDatabase
-          .collection("users")
-          .doc(myAuthentication.currentUser.uid)
-          .set({
-            type: "restaurant",
-            restaurant_name: restaurantName,
-            restaurant_address: restaurantAddress,
-            registrant_name: registrantName,
-            email: registrantEmail,
-            mobile: registrantMobNumber,
-            is_Verified: false,
-          });
-      })
-      .then(() => {
-        Alert.alert(
-          "Zero Hunger",
-          "Form Submitted Successfully.\nNote: Admin verification under process.\nOnce verified you can login to Zero Hunger.",
-          [{ text: "OK", onPress: () => console.log("Form Submiited") }]
-        );
-      });
-  } catch (e) {
-    if (e.code == "auth/email-already-in-use")
-      alert("Email Already Registered.");
-    else {
-      alert(e.message);
+    try {
+      await ref;
+    } catch (e) {
+      console.log("error is ", e);
     }
-  }
-};
+  };
 
+  const signUp = async (registrantEmail, registrantPassword) => {
+    try {
+      await myAuthentication
+        .createUserWithEmailAndPassword(registrantEmail, registrantPassword)
+        .then(() => {
+          uploadImage(fssaiImageUri, "fssai", myAuthentication.currentUser.uid);
+          uploadImage(
+            categoryImageUri,
+            categoryType,
+            myAuthentication.currentUser.uid
+          );
+          uploadImage(
+            registrantIdImageUri,
+            "id",
+            myAuthentication.currentUser.uid
+          );
+        })
+        .then(() => {
+          myDatabase
+            .collection("users")
+            .doc(myAuthentication.currentUser.uid)
+            .set({
+              type: categoryType,
+              category_name: categoryName, //name of hotel, restaurant, caterering, NGO
+              category_city: categoryCity,
+              category_state: categoryState,
+              category_address: categoryAddress,
+              registrant_name: registrantName,
+              email: registrantEmail,
+              mobile: registrantMobNumber,
+              is_Verified: false,
+            });
+        })
+        .then(() => {
+          Alert.alert(
+            "Zero Hunger",
+            "Form Submitted Successfully.\nNote: Admin verification under process.\nOnce verified you can login to Zero Hunger.",
+            [{ text: "OK", onPress: () => navigation.navigate("Login") }]
+          );
+        });
+    } catch (e) {
+      if (e.code == "auth/email-already-in-use")
+        alert("Email Already Registered.");
+    }
+  };
   const handleSubmit = () => {
     if (
-      restaurantName &&
-      restaurantAddress &&
-      restaurantImageUri &&
+      categoryName &&
+      categoryCity &&
+      categoryState &&
+      categoryAddress &&
+      categoryImageUri &&
       fssaiImageUri &&
       registrantName &&
       checkValidRegistrantEmail &&
@@ -226,15 +235,37 @@ const signUp = async (registrantEmail, registrantPassword) => {
 
   return (
     <View>
-      <Text style={styles.selectedTypeHeading}>Restaurant Registration</Text>
+      <Text style={styles.selectedTypeHeading}>
+        {categoryType} Registration
+      </Text>
 
-      <Text style={styles.heading}>Restaurant Details</Text>
+      <Text style={styles.heading}>{categoryType} Details</Text>
       <View style={styles.labelInputBoxWrapper}>
-        <Text style={styles.label}>Restaurant Name</Text>
+        <Text style={styles.label}>{categoryType} Name</Text>
         <InputBox
-          placeholder="Restaurant Name"
-          value={restaurantName}
-          onChangeText={setRestaurantName}
+          placeholder={`${categoryType} Name`}
+          value={categoryName}
+          onChangeText={setCategoryName}
+          style={{ fontSize: 18 }}
+        />
+      </View>
+
+      <View style={styles.labelInputBoxWrapper}>
+        <Text style={styles.label}>City</Text>
+        <InputBox
+          placeholder="City Name"
+          value={categoryCity}
+          onChangeText={setCategoryCity}
+          style={{ fontSize: 18 }}
+        />
+      </View>
+
+      <View style={styles.labelInputBoxWrapper}>
+        <Text style={styles.label}>State</Text>
+        <InputBox
+          placeholder="State Name"
+          value={categoryState}
+          onChangeText={setCategoryState}
           style={{ fontSize: 18 }}
         />
       </View>
@@ -243,16 +274,16 @@ const signUp = async (registrantEmail, registrantPassword) => {
         <Text style={styles.label}>Full Address</Text>
         <InputBox
           placeholder="Full Address"
-          value={restaurantAddress}
-          onChangeText={setRestaurantAddress}
+          value={categoryAddress}
+          onChangeText={setCategoryAddress}
           style={{ fontSize: 18 }}
         />
       </View>
 
       <View style={styles.labelInputBoxWrapper}>
-        <Text style={styles.label}>Restaurant Image</Text>
+        <Text style={styles.label}>{categoryType} Image</Text>
         <View>
-          {!restaurantImageUri && (
+          {!categoryImageUri && (
             <View
               style={{
                 flexDirection: "row",
@@ -264,7 +295,7 @@ const signUp = async (registrantEmail, registrantPassword) => {
                 style={styles.icon}
                 source={require("../images/camera-icon.png")}
               />
-              <TouchableOpacity onPress={handleUploadRestaurantImage}>
+              <TouchableOpacity onPress={handleUploadCategoryImage}>
                 <Text
                   style={{
                     color: Colors.primary,
@@ -277,7 +308,7 @@ const signUp = async (registrantEmail, registrantPassword) => {
               </TouchableOpacity>
             </View>
           )}
-          {restaurantImageUri && (
+          {categoryImageUri && (
             <View
               style={{
                 flexDirection: "row",
@@ -285,8 +316,8 @@ const signUp = async (registrantEmail, registrantPassword) => {
                 justifyContent: "space-between",
               }}
             >
-              <Image style={styles.icon} source={{ uri: restaurantImageUri }} />
-              <TouchableOpacity onPress={handleUploadRestaurantImage}>
+              <Image style={styles.icon} source={{ uri: categoryImageUri }} />
+              <TouchableOpacity onPress={handleUploadCategoryImage}>
                 <Text
                   style={{
                     color: Colors.primary,
@@ -317,7 +348,7 @@ const signUp = async (registrantEmail, registrantPassword) => {
                 style={styles.icon}
                 source={require("../images/fssai-icon.png")}
               />
-              <TouchableOpacity onPress={handleUploadRestaurantFssaiImage}>
+              <TouchableOpacity onPress={handleUploadCategoryFssaiImage}>
                 <Text
                   style={{
                     color: Colors.primary,
@@ -339,7 +370,7 @@ const signUp = async (registrantEmail, registrantPassword) => {
               }}
             >
               <Image style={styles.icon} source={{ uri: fssaiImageUri }} />
-              <TouchableOpacity onPress={handleUploadRestaurantFssaiImage}>
+              <TouchableOpacity onPress={handleUploadCategoryFssaiImage}>
                 <Text
                   style={{
                     color: Colors.primary,
@@ -477,23 +508,11 @@ const signUp = async (registrantEmail, registrantPassword) => {
       <Text style={[styles.label, { marginLeft: 20 }]}>
         Once verified then you can use Zero Hunger App.
       </Text>
-      <TouchableOpacity onPress={handleSubmit}>
-        <LinearGradient
-          colors={[Colors.primary, Colors.secondary]}
-          style={styles.submitButton}
-        >
-          <Text
-            style={{
-              fontSize: 20,
-              color: Colors.white,
-              fontFamily: "sans-serif",
-              fontWeight: "bold",
-            }}
-          >
-            SUBMIT
-          </Text>
-        </LinearGradient>
-      </TouchableOpacity>
+      <MyButton
+        buttonStyle={{ width: "60%", marginBottom: 80 }}
+        text="SUBMIT"
+        onPress={handleSubmit}
+      />
     </View>
   );
 }
@@ -536,17 +555,7 @@ const styles = StyleSheet.create({
     fontFamily: "serif",
     marginTop: 20,
   },
-  submitButton: {
-    backgroundColor: Colors.primary,
-    width: "60%",
-    alignSelf: "center",
-    height: 50,
-    marginTop: 20,
-    marginBottom: 60,
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   validationText: {
     fontSize: 13,
     color: "red",

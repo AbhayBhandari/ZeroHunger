@@ -10,19 +10,10 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import * as Animatable from "react-native-animatable";
+
 import Colors from "../Colors";
-
-import HotelSignUp from "../components/HotelSignUp";
-import Restaurant from "../components/RestaurantSignUp";
-import CatererSignUp from "../components/CatererSignUp";
-import NgoSignUp from "../components/NgoSignUp";
-
-const labels = [
-  { type: "Hotel", image: require("../images/hotel.png") },
-  { type: "Restaurant", image: require("../images/restaurant.png") },
-  { type: "Caterer", image: require("../images/caterer.png") },
-  { type: "NGO", image: require("../images/ngo.png") },
-];
+import Categories from "../utils/Categories";
+import SignUp from "../components/SignUp";
 
 export default function RegistrationScreen({ navigation }) {
   const [selectType, setSelectType] = useState("");
@@ -64,7 +55,7 @@ export default function RegistrationScreen({ navigation }) {
             />
 
             <View style={styles.typeContainer}>
-              {labels.map((item) => (
+              {Categories.map((item) => (
                 <TouchableOpacity
                   key={item.type}
                   style={styles.headerTypeContent}
@@ -83,10 +74,7 @@ export default function RegistrationScreen({ navigation }) {
             </View>
 
             <Animatable.View animation="bounceIn" duration={4000}>
-              {selectType === "Hotel" ? <HotelSignUp /> : null}
-              {selectType === "Restaurant" ? <Restaurant /> : null}
-              {selectType === "Caterer" ? <CatererSignUp /> : null}
-              {selectType === "NGO" ? <NgoSignUp /> : null}
+              {selectType == "" ? null : <SignUp categoryType={selectType} />}
             </Animatable.View>
             
           </Animatable.View>

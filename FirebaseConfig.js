@@ -1,7 +1,7 @@
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth'; //for authenticaiton
-import 'firebase/compat/firestore';
-import 'firebase/compat/storage';
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth"; //for authenticaiton
+import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
