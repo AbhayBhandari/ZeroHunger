@@ -48,7 +48,7 @@ export default function LoginScreen({ navigation }) {
             .then((categoryData) => {
               //set false to true
               if (categoryData.data().is_Verified == true) {
-                navigation.navigate("Home");
+                navigation.navigate("Home", {categoryType:categoryData.data().type});
               } else {
                 alert(
                   "Account is not verified yet. Please wait for few hours."

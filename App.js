@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
 
 import LoginScreen from "./src/screen/LoginScreen";
 import OnBoardingScreen from "./src/screen/OnBoardingScreen";
@@ -52,5 +51,3 @@ export default function App() {
     );
   }
 }
-
-const styles = StyleSheet.create({});

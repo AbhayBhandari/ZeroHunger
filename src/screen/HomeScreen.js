@@ -1,87 +1,199 @@
-import {
-  FlatList,
-  Image,
-  Platform,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import HomeScreenHeader from "../components/HomeScreenHeader";
-import HomeScreenFooter from "../components/HomeScreenFooter";
-import SearchBox from "../components/SearchBox";
-import Card from "../components/Card";
+import { StyleSheet, Image } from "react-native";
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import { myDatabase, myStorage } from "../utils/FirebaseConfig";
+import CategoryTab from "./CategoryTab";
+import MyProfileTab from "./MyProfileTab";
+import Colors from "../utils/Colors";
 
-export default function HomeScreen() {
-  const [DATA, setDATA] = useState([]);
+const Tab = createBottomTabNavigator();
 
-  useEffect(() => {
-    myDatabase
-      .collection("users")
-      //.where("type", "==", "Caterering")
-      .get()
-      .then((categoryData) => {
-        categoryData.forEach((data) => {
-          let url = myStorage.ref(
-            `users/${data.data().type}/${data.id}/${data.data().type}.jpeg`
-          );
-          (async () => {
-            url = await url.getDownloadURL();
-
-            setDATA((preArray) => [
-              ...preArray,
-              {
-                id: data.id,
-                imageUri: url,
-                name: data.data().category_name,
-                type: `${data.data().type}`,
-                location: `${data.data().category_city}, ${
-                  data.data().category_state
-                }`,
-              },
-            ]);
-          })();
-        });
-      });
-  }, []);
-
-  const [searchText, setSearchText] = useState("");
-
-  return (
-    <View style={styles.container}>
-      <HomeScreenHeader />
-      <SearchBox value={searchText} setValue={setSearchText} />
-      <View style={styles.body}>
-        <FlatList
-          data={DATA}
-          keyExtractor={(data) => data.id}
-          renderItem={({ item }) => (
-            <Card
-              imageUri={item.imageUri}
-              name={item.name}
-              type={item.type}
-              location={item.location}
-              userId={item.id}
-            />
-          )}
-          ListFooterComponent={() => <View style={{ marginBottom: 40 }} />}
+export default function HomeScreen({ route }) {
+  const categoryType = route.params.categoryType;
+  if (
+    categoryType == "Hotel" ||
+    categoryType == "Restaurant" ||
+    categoryType == "Caterering"
+  ) {
+    return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: Colors.grey,
+            marginHorizontal: -50,
+          },
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused }) => {
+            if (route.name == "NGOTab") {
+              if (focused) {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/ngo-filled.png")}
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/ngo.png")}
+                  />
+                );
+              }
+            }
+            if (route.name == "MyProfileTab") {
+              if (focused) {
+                return (
+                  <Image
+                    style={styles.profileFocusedIconStyle}
+                    source={require("../images/MyProfile.jpg")}
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    style={styles.profileUnFocusedIconStyle}
+                    source={require("../images/MyProfile.jpg")}
+                  />
+                );
+              }
+            }
+          },
+        })}
+      >
+        <Tab.Screen
+          name="NGOTab"
+          component={CategoryTab}
+          initialParams={{ categoryType: "NGO" }}
         />
-      </View>
-      <HomeScreenFooter userImage={require("../images/MyProfile.jpg")} />
-    </View>
-  );
+        <Tab.Screen name="MyProfileTab" component={MyProfileTab} />
+      </Tab.Navigator>
+    );
+  }
+  //for NGO Login
+  else {
+    return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: Colors.grey,
+          },
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused }) => {
+            if (route.name == "HotelTab") {
+              if (focused) {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/hotel-filled.png")}
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/hotel.png")}
+                  />
+                );
+              }
+            }
+            if (route.name == "RestaurantTab") {
+              if (focused) {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/restaurant-filled.png")}
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/restaurant.png")}
+                  />
+                );
+              }
+            }
+            if (route.name == "CatereringTab") {
+              if (focused) {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/caterer-filled.png")}
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    style={styles.iconStyle}
+                    source={require("../images/caterer.png")}
+                  />
+                );
+              }
+            }
+            if (route.name == "MyProfileTab") {
+              if (focused) {
+                return (
+                  <Image
+                    style={styles.profileFocusedIconStyle}
+                    source={require("../images/MyProfile.jpg")}
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    style={styles.profileUnFocusedIconStyle}
+                    source={require("../images/MyProfile.jpg")}
+                  />
+                );
+              }
+            }
+          },
+        })}
+      >
+        <Tab.Screen
+          name="HotelTab"
+          component={CategoryTab}
+          initialParams={{ categoryType: "Hotel" }}
+        />
+        <Tab.Screen
+          name="RestaurantTab"
+          component={CategoryTab}
+          initialParams={{ categoryType: "Restaurant" }}
+        />
+        <Tab.Screen
+          name="CatereringTab"
+          component={CategoryTab}
+          initialParams={{ categoryType: "Caterering" }}
+        />
+        <Tab.Screen name="MyProfileTab" component={MyProfileTab} />
+      </Tab.Navigator>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    marginBottom: 4,
+  iconStyle: {
+    width: 30,
+    height: 35,
+    resizeMode: "contain",
   },
-  container: {
-    flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 0,
+  profileFocusedIconStyle: {
+    width: 35,
+    height: 35,
+    resizeMode: "contain",
+    borderWidth: 1,
+    borderRadius: 100,
+    overflow: "hidden",
+    borderColor: Colors.primary,
+  },
+  profileUnFocusedIconStyle: {
+    width: 35,
+    height: 35,
+    resizeMode: "contain",
+    borderRadius: 100,
+    overflow: "hidden",
   },
 });
