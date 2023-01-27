@@ -1,17 +1,32 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
 import Colors from "../utils/Colors";
 
-export default function MyButton({ text, onPress, buttonStyle, textStyle }) {
+export default function MyButton({
+  text,
+  onPress,
+  buttonStyle,
+  textStyle,
+  isButtonPressed,
+}) {
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient
         colors={[Colors.primary, Colors.secondary]}
         style={[styles.button, buttonStyle]}
       >
-        <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+        {!isButtonPressed && (
+          <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+        )}
+
+        {isButtonPressed && <ActivityIndicator size="large" color="white" />}
       </LinearGradient>
     </TouchableOpacity>
   );
