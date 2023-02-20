@@ -1,14 +1,28 @@
 import { StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import CategoryTab from "./CategoryTab";
 import MyProfileTab from "./MyProfileTab";
 import Colors from "../utils/Colors";
+import { myStorage } from "../utils/FirebaseConfig";
 
 const Tab = createBottomTabNavigator();
 
 export default function HomeScreen({ route }) {
+  const [profileUri, setProfileUri] = useState();
+
+  useEffect(() => {
+    let url = myStorage.ref(
+      `users/${route.params.categoryType}/${route.params.uid}/${route.params.categoryType}.jpeg`
+    );
+
+    (async () => {
+      url = await url.getDownloadURL();
+      setProfileUri(url);
+    })();
+  }, []);
+
   const categoryType = route.params.categoryType;
   if (
     categoryType == "Hotel" ||
@@ -47,14 +61,14 @@ export default function HomeScreen({ route }) {
                 return (
                   <Image
                     style={styles.profileFocusedIconStyle}
-                    source={require("../images/MyProfile.jpg")}
+                    source={{ uri: profileUri }}
                   />
                 );
               } else {
                 return (
                   <Image
                     style={styles.profileUnFocusedIconStyle}
-                    source={require("../images/MyProfile.jpg")}
+                    source={{ uri: profileUri }}
                   />
                 );
               }
@@ -138,14 +152,14 @@ export default function HomeScreen({ route }) {
                 return (
                   <Image
                     style={styles.profileFocusedIconStyle}
-                    source={require("../images/MyProfile.jpg")}
+                    source={{ uri: profileUri }}
                   />
                 );
               } else {
                 return (
                   <Image
                     style={styles.profileUnFocusedIconStyle}
-                    source={require("../images/MyProfile.jpg")}
+                    source={{ uri: profileUri }}
                   />
                 );
               }
